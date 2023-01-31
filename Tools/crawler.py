@@ -60,5 +60,5 @@ with open("header.html", "w", encoding="utf-8") as f:
     f.write(str(header.prettify()))
 with open("footer.html", "w", encoding="utf-8") as f:
     f.write(str(footer.prettify()))
-with open("style.css", "w", encoding="utf-8") as f:
+with open("main.scss", "w", encoding="utf-8") as f:
     f.write(str(formatted_css))
