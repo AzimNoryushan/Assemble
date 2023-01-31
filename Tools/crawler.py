@@ -14,6 +14,9 @@ if not os.path.exists(project_name):
 # set the new directory as the current working directory
 os.chdir(project_name)
 
+# Initialize npm project
+os.system("npm init -y")
+
 # Make a request to the webpage
 response = requests.get(url)
 
