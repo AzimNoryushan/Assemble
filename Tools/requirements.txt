@@ -1,0 +1,4 @@
+beautifulsoup4==4.11.1
+cssbeautifier==1.14.7
+cssutils==2.3.1
+requests==2.27.1
