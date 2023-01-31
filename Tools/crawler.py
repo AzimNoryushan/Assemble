@@ -28,8 +28,13 @@ header = soup.find("header")
 footer = soup.find("footer")
 
 # Extract the class names used in the header and footer elements
-header_classes = [c for c in header.find_all(class_=True) if header.get("class")]
-footer_classes = [c for c in footer.find_all(class_=True) if footer.get("class")]
+header_classes = []
+for element in header.select('[class]'):
+    header_classes.extend(element['class'])
+
+footer_classes = []
+for element in footer.select('[class]'):
+    footer_classes.extend(element['class'])
 
 # Extract the URLs of the CSS files
 css_urls = [link["href"] for link in soup.find_all("link", rel="stylesheet")]
@@ -48,8 +53,10 @@ css_class_names = []
 for css_file in css_content:
     css_class_names += [c.split("{")[0].replace(".", "") for c in css_file.split("}") if "." in c]
 
+used_classes = header_classes + footer_classes
+
 # Remove class names that are not used in header or footer
-css_class_names = list(set(css_class_names) & set(header_classes + footer_classes))
+css_class_names = list(set(css_class_names) & set(used_classes))
 
 # Beautify CSS
 css_content = '\n'.join(css_content)
