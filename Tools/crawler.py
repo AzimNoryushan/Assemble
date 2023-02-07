@@ -24,34 +24,47 @@ response = requests.get(url)
 soup = BeautifulSoup(response.content, "html.parser")
 
 # Extract the header and footer elements
-header = soup.find("headers")
-footer = soup.find("footers")
+header = soup.find("header")
+footer = soup.find("footer")
 
-if header is not None and footer is not None:
-    # Extract the class names used in the header and footer elements
-    header_classes = []
-    for element in header.select('[class]'):
-        header_classes.extend(element['class'])
+if len(sys.argv) < 4:
+    if header is None and footer is None:
+        print("header and/or footer elements are not present in the page")
+        header_class = input("Enter the class name for header element: ")
+        footer_class = input("Enter the class name for footer element: ")
 
-    footer_classes = []
-    for element in footer.select('[class]'):
-        footer_classes.extend(element['class'])
+        header = soup.find("div", class_=header_class)
+        footer = soup.find("div", class_=footer_class)
+    else:
+        pass
 else:
-    print("header and/or footer elements are not present in the page")
-    header_class = input("Enter the class name for header element: ")
-    footer_class = input("Enter the class name for footer element: ")
+    if sys.argv[3] == "--custom-header":
+        header_class = input("Enter the class name for header element: ")
+        header = soup.find("div", class_=header_class)
+    elif sys.argv[3] == "--custom-footer":
+        footer_class = input("Enter the class name for footer element: ")
+        footer = soup.find("div", class_=footer_class)
+    elif sys.argv[3] == "--custom":
+        header_class = input("Enter the class name for header element: ")
+        footer_class = input("Enter the class name for footer element: ")
 
-    header = soup.find("header", class_=header_class)
-    footer = soup.find("footer", class_=footer_class)
+        header = soup.find("div", class_=header_class)
+        footer = soup.find("div", class_=footer_class)
+    elif sys.argv[3] == "--help":
+        print("Coming soon...")
+    else:
+        print("Could not recognize flag " + sys.argv[3])
+        pass
 
-    # Extract the class names used in the header and footer elements
-    header_classes = []
-    for element in header.select('[class]'):
-        header_classes.extend(element['class'])
 
-    footer_classes = []
-    for element in footer.select('[class]'):
-        footer_classes.extend(element['class'])
+# Extract the class names used in the header and footer elements
+header_classes = []
+for element in header.select('[class]'):
+    header_classes.extend(element['class'])
+
+footer_classes = []
+for element in footer.select('[class]'):
+    footer_classes.extend(element['class'])
 
 # Check if there is a <style> tag in the HTML
 style_tags = soup.find_all("style")
