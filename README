@@ -1,0 +1,14 @@
+HOW TO USE
+==========
+python ./Tools/crawler.py <URL> <PROJECT_NAME>
+
+OPTIONAL
+========
+python ./Tools/crawler.py <URL> <PROJECT_NAME> <FLAG>
+
+List of flag options
+====================
+--custom-header         Allow to input div class name for header only. Note: Footer will use default footer html element
+--custom-footer         Allow to input div class name for footer only. Note: Footer will use default footer html element
+--custom                Allow to input div class name for header and footer.
+--help                  Show list of flag options.
