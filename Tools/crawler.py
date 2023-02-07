@@ -24,29 +24,55 @@ response = requests.get(url)
 soup = BeautifulSoup(response.content, "html.parser")
 
 # Extract the header and footer elements
-header = soup.find("header")
-footer = soup.find("footer")
+header = soup.find("headers")
+footer = soup.find("footers")
 
-# Extract the class names used in the header and footer elements
-header_classes = []
-for element in header.select('[class]'):
-    header_classes.extend(element['class'])
+if header is not None and footer is not None:
+    # Extract the class names used in the header and footer elements
+    header_classes = []
+    for element in header.select('[class]'):
+        header_classes.extend(element['class'])
 
-footer_classes = []
-for element in footer.select('[class]'):
-    footer_classes.extend(element['class'])
+    footer_classes = []
+    for element in footer.select('[class]'):
+        footer_classes.extend(element['class'])
+else:
+    print("header and/or footer elements are not present in the page")
+    header_class = input("Enter the class name for header element: ")
+    footer_class = input("Enter the class name for footer element: ")
 
-# Extract the URLs of the CSS files
-css_urls = [link["href"] for link in soup.find_all("link", rel="stylesheet")]
+    header = soup.find("header", class_=header_class)
+    footer = soup.find("footer", class_=footer_class)
 
-# Remove the URLs that start with "https"
-css_urls = [url for url in css_urls if not url.startswith("https")]
+    # Extract the class names used in the header and footer elements
+    header_classes = []
+    for element in header.select('[class]'):
+        header_classes.extend(element['class'])
 
-# Make requests to retrieve the CSS files
-css_content = []
-for css_url in css_urls:
-    css_response = requests.get(url + css_url)
-    css_content.append(css_response.text)
+    footer_classes = []
+    for element in footer.select('[class]'):
+        footer_classes.extend(element['class'])
+
+# Check if there is a <style> tag in the HTML
+style_tags = soup.find_all("style")
+if style_tags:
+    css_content = ""
+    for style_tag in style_tags:
+        css_content += style_tag.get_text()
+    
+else:
+    # Extract the URLs of the CSS files
+    css_urls = [link["href"] for link in soup.find_all("link", rel="stylesheet")]
+
+    # Remove the URLs that start with "https"
+    css_urls = [url for url in css_urls if not url.startswith("https")]
+
+    # Make requests to retrieve the CSS files
+    css_content = []
+    for css_url in css_urls:
+        css_response = requests.get(url + css_url)
+        css_content.append(css_response.text)
+    css_content = '\n'.join(css_content)
 
 # Extract class names from css files
 css_class_names = []
@@ -59,7 +85,6 @@ used_classes = header_classes + footer_classes
 css_class_names = list(set(css_class_names) & set(used_classes))
 
 # Beautify CSS
-css_content = '\n'.join(css_content)
 formatted_css = beautify(css_content)
 
 # Save the header, footer and css files to files
