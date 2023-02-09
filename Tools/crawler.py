@@ -1,11 +1,33 @@
 import requests
 from bs4 import BeautifulSoup
 from cssbeautifier import beautify
-import sys
 import os
+import argparse
 
-url = sys.argv[1] #"https://www.parkinsons.org.uk/"
-project_name = sys.argv[2]
+# Create an argument parser object
+parser = argparse.ArgumentParser(
+    usage='crawler.py url project_name [-h] [--custom-header | --custom-footer | --custom]',
+    description='Crawler script',
+    formatter_class=argparse.RawDescriptionHelpFormatter
+)
+
+# Add two required arguments 'url' and 'project_name'
+parser.add_argument('url', help='The URL of the website to crawl')
+parser.add_argument('project_name', help='The name of the project')
+
+# Create a mutually exclusive group of arguments
+group = parser.add_mutually_exclusive_group()
+
+# Add three options to the group
+group.add_argument('--custom-header', action='store_true', help='Allow to input div class name for header only')
+group.add_argument('--custom-footer', action='store_true', help='Allow to input div class name for footer only')
+group.add_argument('--custom', action='store_true', help='Allow to input div class name for header and footer')
+
+# Parse the arguments
+args = parser.parse_args()
+
+url = args.url
+project_name = args.project_name
 
 # create the directory
 if not os.path.exists(project_name):
@@ -38,24 +60,26 @@ if len(sys.argv) < 4:
     else:
         pass
 else:
-    if sys.argv[3] == "--custom-header":
+    if args.custom_header:
+        print('Using custom header option')
         header_class = input("Enter the class name for header element: ")
         header = soup.find("div", class_=header_class)
-    elif sys.argv[3] == "--custom-footer":
+    elif args.custom_footer:
+        print('Using custom footer option')
         footer_class = input("Enter the class name for footer element: ")
         footer = soup.find("div", class_=footer_class)
-    elif sys.argv[3] == "--custom":
+    elif args.custom:
+        print('Using custom header and footer option')
         header_class = input("Enter the class name for header element: ")
         footer_class = input("Enter the class name for footer element: ")
 
         header = soup.find("div", class_=header_class)
         footer = soup.find("div", class_=footer_class)
-    elif sys.argv[3] == "--help":
-        print("Coming soon...")
+    elif args.help:
+        parser.print_help()
     else:
-        print("Could not recognize flag " + sys.argv[3])
-        pass
-
+        print('No option selected')
+        parser.print_help()
 
 # Extract the class names used in the header and footer elements
 header_classes = []
