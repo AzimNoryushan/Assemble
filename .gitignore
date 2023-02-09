@@ -1,0 +1,5 @@
+# Ignores other folders
+/*/
+
+# Ignores the todo file
+todo
