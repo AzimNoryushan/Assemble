@@ -1,5 +1,6 @@
-# Ignores other folders
-/*/
-
 # Ignores the todo file
 todo
+
+# Ignore everything else except Tools
+/*/
+!Tools/

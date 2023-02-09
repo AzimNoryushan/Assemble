@@ -49,7 +49,33 @@ soup = BeautifulSoup(response.content, "html.parser")
 header = soup.find("header")
 footer = soup.find("footer")
 
-if len(sys.argv) < 4:
+# if len(sys.argv) < 4:
+#     if header is None and footer is None:
+#         print("header and/or footer elements are not present in the page")
+#         header_class = input("Enter the class name for header element: ")
+#         footer_class = input("Enter the class name for footer element: ")
+
+#         header = soup.find("div", class_=header_class)
+#         footer = soup.find("div", class_=footer_class)
+#     else:
+#         pass
+# else:
+if args.custom_header:
+    print('Using custom header option')
+    header_class = input("Enter the class name for header element: ")
+    header = soup.find("div", class_=header_class)
+elif args.custom_footer:
+    print('Using custom footer option')
+    footer_class = input("Enter the class name for footer element: ")
+    footer = soup.find("div", class_=footer_class)
+elif args.custom:
+    print('Using custom header and footer option')
+    header_class = input("Enter the class name for header element: ")
+    footer_class = input("Enter the class name for footer element: ")
+
+    header = soup.find("div", class_=header_class)
+    footer = soup.find("div", class_=footer_class)
+else:
     if header is None and footer is None:
         print("header and/or footer elements are not present in the page")
         header_class = input("Enter the class name for header element: ")
@@ -59,27 +85,6 @@ if len(sys.argv) < 4:
         footer = soup.find("div", class_=footer_class)
     else:
         pass
-else:
-    if args.custom_header:
-        print('Using custom header option')
-        header_class = input("Enter the class name for header element: ")
-        header = soup.find("div", class_=header_class)
-    elif args.custom_footer:
-        print('Using custom footer option')
-        footer_class = input("Enter the class name for footer element: ")
-        footer = soup.find("div", class_=footer_class)
-    elif args.custom:
-        print('Using custom header and footer option')
-        header_class = input("Enter the class name for header element: ")
-        footer_class = input("Enter the class name for footer element: ")
-
-        header = soup.find("div", class_=header_class)
-        footer = soup.find("div", class_=footer_class)
-    elif args.help:
-        parser.print_help()
-    else:
-        print('No option selected')
-        parser.print_help()
 
 # Extract the class names used in the header and footer elements
 header_classes = []
