@@ -3,10 +3,11 @@ from bs4 import BeautifulSoup
 from cssbeautifier import beautify
 import os
 import argparse
+from urllib.parse import urljoin
 
 # Create an argument parser object
 parser = argparse.ArgumentParser(
-    usage='crawler.py url project_name [-h] [--custom-header | --custom-footer | --custom]',
+    usage='crawler.py <url> <project_name> <deploy_token> [-h] [--custom-header | --custom-footer | --custom]',
     description='Crawler script',
     formatter_class=argparse.RawDescriptionHelpFormatter
 )
@@ -14,6 +15,7 @@ parser = argparse.ArgumentParser(
 # Add two required arguments 'url' and 'project_name'
 parser.add_argument('url', help='The URL of the website to crawl')
 parser.add_argument('project_name', help='The name of the project')
+parser.add_argument('deploy_token', help='Deploy token for authentication')
 
 # Create a mutually exclusive group of arguments
 group = parser.add_mutually_exclusive_group()
@@ -28,8 +30,9 @@ args = parser.parse_args()
 
 url = args.url
 project_name = args.project_name
+deploy_token = args.deploy_token
 
-# create the directory
+# create the project directory
 if not os.path.exists(project_name):
     os.makedirs(project_name)
 
@@ -38,6 +41,11 @@ os.chdir(project_name)
 
 # Initialize npm project
 os.system("npm init -y")
+
+os.system("npm config set @assemble:registry https://code.dutysheet.com/api/v4/projects/94/packages/npm/")
+os.system("npm config set //code.dutysheet.com/api/v4/projects/94/packages/npm/:_authToken " + deploy_token)
+os.system("npm install @assemble/branding-cli")
+os.system("npx assemble-branding init")
 
 # Make a request to the webpage
 response = requests.get(url)
@@ -118,10 +126,27 @@ css_class_names = list(set(css_class_names) & set(used_classes))
 # Beautify CSS
 formatted_css = beautify(css_content)
 
+# Find all the <img> tags on the page
+img_tags = soup.find_all('img')
+
+# Extract the URLs of all the images from the <img> tags
+img_urls = [img['src'] for img in img_tags]
+
+# create the assets directory
+if not os.path.exists('src/assets'):
+    os.makedirs('src/assets')
+
+# Download each image and save it to the assets folder
+for img_url in img_urls:
+    abs_url = urljoin(url, img_url)
+    img_name = img_url.split("/")[-1]
+    with open(f"src/assets/{img_name}", "wb") as f:
+        f.write(requests.get(abs_url).content)
+
 # Save the header, footer and css files to files
-with open("header.html", "w", encoding="utf-8") as f:
+with open("src/header.html", "w", encoding="utf-8") as f:
     f.write(str(header.prettify()))
-with open("footer.html", "w", encoding="utf-8") as f:
+with open("src/footer.html", "w", encoding="utf-8") as f:
     f.write(str(footer.prettify()))
-with open("main.scss", "w", encoding="utf-8") as f:
+with open("src/styles/main.scss", "a", encoding="utf-8") as f:
     f.write(str(formatted_css))
